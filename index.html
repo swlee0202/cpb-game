@@ -352,6 +352,12 @@
     .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .backup-help { color: var(--muted); font-size: 10px; line-height: 1.65; margin: 10px 0 0; }
     .settings-panel { margin-bottom: 14px; }
+    .card-stack-badges { display: flex; align-items: center; gap: 4px; }
+    .stack-count { color: #e4edf2; background: rgba(198,212,223,.12); }
+    .stack-controls { display: grid; grid-template-columns: 28px minmax(0,1fr) 28px; align-items: center; gap: 7px; margin-top: 9px; }
+    .stack-controls button { width: 28px; height: 27px; border: 1px solid rgba(198,212,223,.22); border-radius: 7px; color: #e4edf2; background: rgba(198,212,223,.08); font-size: 15px; line-height: 1; }
+    .stack-controls button:disabled { opacity: .35; cursor: not-allowed; }
+    .stack-controls span { color: #aebdc7; font-size: 8px; line-height: 1.45; text-align: center; }
     .setting-options { display: grid; gap: 9px; margin-top: 12px; }
     .setting-option { display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 1px solid rgba(255,255,255,.07); border-radius: 10px; background: rgba(9,15,21,.22); padding: 12px 14px; cursor: pointer; }
     .setting-option strong { display: block; font-size: 11px; }
@@ -673,6 +679,17 @@
     }
     function isTrainingCard(card) { return Boolean(card?.trainingOnly || card?.rarity === "TRAINING"); }
     function isPlayerCard(card) { return Boolean(card) && !isTrainingCard(card); }
+    function groupTrainingCardStacks(cards) {
+      const entries=[],stacksByValue=new Map();
+      for(const card of cards) {
+        if(!isTrainingCard(card)) { entries.push({card}); continue; }
+        const value=Number(card.trainingMaterialValue)||0;
+        let entry=stacksByValue.get(value);
+        if(!entry) { entry={card,stackCards:[]}; stacksByValue.set(value,entry); entries.push(entry); }
+        entry.stackCards.push(card);
+      }
+      return entries;
+    }
     function displayName(card) { return isTrainingCard(card) ? "훈련 카드" : `${card.player}'${String(card.year).slice(-2)}`; }
     function makeInitialState() {
       let serial = 1;
@@ -975,8 +992,9 @@
       const disabled = options.disabled ? "disabled" : "";
       const disabledClass = options.disabled ? "is-disabled" : "";
       if(isTrainingCard(card)) {
-        const value=Number(card.trainingMaterialValue)||0;
-        return `<${tag} ${buttonAttrs} ${disabled} class="player-card card-training ${selected?"is-selected":""} ${disabledClass}" ${actionAttrs}><div class="player-card-top"><span class="mini-pos">재료</span>${rarityBadge(card)}</div><div class="player-card-name">훈련 카드</div><div class="player-card-role">공용 훈련 재료</div><div class="player-card-rating"><small>훈련 별</small><strong>${value}</strong></div>${footer}</${tag}>`;
+        const value=Number(card.trainingMaterialValue)||0,stackQuantity=Math.max(1,Number(options.stackQuantity)||1);
+        const countBadge=stackQuantity>1?`<span class="rarity-badge stack-count">×${stackQuantity}</span>`:"";
+        return `<${tag} ${buttonAttrs} ${disabled} class="player-card card-training ${selected?"is-selected":""} ${disabledClass}" ${actionAttrs}><div class="player-card-top"><span class="mini-pos">재료</span><div class="card-stack-badges">${rarityBadge(card)}${countBadge}</div></div><div class="player-card-name">훈련 카드</div><div class="player-card-role">공용 훈련 재료${stackQuantity>1?` · ${stackQuantity}장 보유`:""}</div><div class="player-card-rating"><small>훈련 별 / 장</small><strong>${value}</strong></div>${footer}</${tag}>`;
       }
       return `<${tag} ${buttonAttrs} ${disabled} class="player-card card-${rarity(card).css} ${selected?"is-selected":""} ${disabledClass}" ${actionAttrs}><div class="player-card-top"><span class="mini-pos">${escapeHtml(card.position)}</span>${rarityBadge(card)}</div><div class="player-card-name">${escapeHtml(displayName(card))}</div><div class="player-card-role">${slotLabel}${escapeHtml(positionLabel(card.position))}</div><div class="player-card-rating"><small>OVR</small><strong>${formatOvr(getOvr(card))}</strong>${enhancementBadgeMarkup(card)}</div><div class="player-card-stats">${stats.map((value,index)=>`<div class="player-card-stat">${labels[index]}<b>${value}</b></div>`).join("")}</div>${card.skill?`<div class="player-card-skill" title="${escapeHtml(skillTooltip(card))}">스킬 Lv.${skillLevelFor(card)} · ${escapeHtml(card.skill)}</div>`:""}${footer}</${tag}>`;
     }
@@ -1125,9 +1143,10 @@
     }
     function renderDraw() {
       const resultCards = state.lastPull ? (Array.isArray(state.lastPull.cardIds)?state.lastPull.cardIds:[state.lastPull.cardId]).map(cardById).filter(Boolean) : [];
+      const resultGroups=groupTrainingCardStacks(resultCards);
       const resultBox = document.getElementById("draw-result");
       if (!resultCards.length) resultBox.innerHTML = `<div class="empty-result">아직 뽑은 카드가 없습니다. 경기 보상으로 스카우트 티켓을 모아 선수를 영입하세요.</div>`;
-      else if (resultCards.length > 1) resultBox.innerHTML = `<div class="pull-results-heading">${state.lastPull.count||resultCards.length}명 뽑기 결과</div><div class="pull-results-grid">${resultCards.map(card=>cardTile(card)).join("")}</div>`;
+      else if (resultCards.length > 1) resultBox.innerHTML = `<div class="pull-results-heading">${state.lastPull.count||resultCards.length}명 뽑기 결과</div><div class="pull-results-grid">${resultGroups.map(entry=>entry.stackCards?cardTile(entry.card,{stackQuantity:entry.stackCards.length}):cardTile(entry.card)).join("")}</div>`;
       else {
         const result = resultCards[0];
         if(isTrainingCard(result)) resultBox.innerHTML = `<div class="result-card"><div class="profile"><div class="result-avatar">훈련</div><div><div class="result-name">훈련 카드</div><div class="result-meta">공용 훈련 재료 · ${Number(result.trainingMaterialValue)||0} 훈련 별</div></div></div><div class="result-ovr">+${Number(result.trainingMaterialValue)||0}<small>훈련 별</small></div></div>`;
@@ -1272,7 +1291,14 @@
       const eligibleIds = new Set(materials.map(card=>card.id));
       pruneSelectedTrainingMaterials(target,eligibleIds);
       const selectedValues=new Map(getSelectedMaterials().map(item=>[item.card.id,item]));
-      list.innerHTML = visibleMaterials.length ? visibleMaterials.map(card=>{
+      const displayMaterials=groupTrainingCardStacks(visibleMaterials);
+      list.innerHTML = displayMaterials.length ? displayMaterials.map(entry=>{
+        if(entry.stackCards) {
+          const card=entry.card,value=trainMaterialValue(card,target),selectedItems=entry.stackCards.map(item=>selectedValues.get(item.id)).filter(Boolean);
+          const selectedCount=selectedItems.length,selectedPoints=selectedItems.reduce((sum,item)=>sum+item.value,0),canAdd=selectedCount<entry.stackCards.length&&remainingTrainingSelectionPoints(target)>0;
+          return `<article class="player-card card-training ${selectedCount?"is-selected":""}"><div class="player-card-top"><span class="mini-pos">재료</span><div class="card-stack-badges">${rarityBadge(card)}<span class="rarity-badge stack-count">×${entry.stackCards.length}</span></div></div><div class="player-card-name">훈련 카드</div><div class="player-card-role">공용 재료 · 1장당 ${value} 훈련 별</div><div class="stack-controls"><button type="button" data-training-stack-step="-1" data-training-stack-value="${value}" aria-label="${value}별 훈련 카드 선택 한 장 해제" ${selectedCount?"":"disabled"}>−</button><span>선택 ${selectedCount}/${entry.stackCards.length}장 · ${selectedPoints}별</span><button type="button" data-training-stack-step="1" data-training-stack-value="${value}" aria-label="${value}별 훈련 카드 한 장 선택" ${canAdd?"":"disabled"}>+</button></div></article>`;
+        }
+        const card=entry.card;
         const value = trainMaterialValue(card,target);
         const selected=selectedValues.get(card.id),shownValue=selected?.value??value;
         const duplicate = !isTrainingCard(card)&&card.playerId&&card.playerId===target.playerId ? " · 동일 선수 2배" : "";
@@ -1296,6 +1322,15 @@
         }
         renderTraining();
       }));
+      list.querySelectorAll("[data-training-stack-step]").forEach(button=>button.addEventListener("click",()=>{
+        const value=Number(button.dataset.trainingStackValue),stack=visibleMaterials.filter(card=>isTrainingCard(card)&&trainMaterialValue(card,target)===value),selected=stack.filter(card=>selectedTrainingMaterialIds.has(card.id));
+        if(button.dataset.trainingStackStep==="1") {
+          const next=stack.find(card=>!selectedTrainingMaterialIds.has(card.id));
+          if(!next||remainingTrainingSelectionPoints(target)<=0) return;
+          selectedTrainingMaterialIds.add(next.id);
+        } else if(selected.length) selectedTrainingMaterialIds.delete(selected[selected.length-1].id);
+        renderTraining();
+      }));
       bulk.querySelectorAll("[data-select-grade]").forEach(button=>button.addEventListener("click",()=>{
         const grade = button.dataset.selectGrade;
         for(const card of visibleMaterials.filter(card=>card.rarity===grade)) {
@@ -1316,15 +1351,20 @@
       const active = activeCardIds();
       const grid = document.getElementById("collection-grid");
       const sorted = [...state.cards].sort((a,b)=>(active.has(b.id)-active.has(a.id)) || getOvr(b)-getOvr(a) || a.player.localeCompare(b.player));
-      const visibleCards = sorted.filter(card=>matchesPosition(card,collectionPositionFilter));
-      document.getElementById("collection-count").textContent = `보유 ${state.cards.length}장 · 표시 ${visibleCards.length}장 · 라인업 ${active.size}장 · 재료 가능 ${state.cards.length-active.size}장`;
+      const visibleCards = groupTrainingCardStacks(sorted).filter(entry=>entry.stackCards?collectionPositionFilter==="ALL":matchesPosition(entry.card,collectionPositionFilter));
+      const visibleCardCount=visibleCards.reduce((sum,entry)=>sum+(entry.stackCards?.length||1),0);
+      document.getElementById("collection-count").textContent = `보유 ${state.cards.length}장 · 표시 ${visibleCardCount}장 · 라인업 ${active.size}장 · 재료 가능 ${state.cards.length-active.size}장`;
       document.getElementById("collection-pill").textContent = `${state.cards.length}장 보유`;
       renderPositionFilters("collection-position-filters",collectionPositionFilter,position=>{
         collectionPositionFilter=position;
         renderCollection();
       });
-      grid.innerHTML = visibleCards.length ? visibleCards.map(card=>{
-        if(isTrainingCard(card)) return `<article class="collection-card card-training"><div class="collection-card-head"><div><div class="collection-name">훈련 카드</div><div class="collection-position">공용 훈련 재료</div></div><div class="collection-badges">${rarityBadge(card)}</div></div><div class="collection-score"><strong>${Number(card.trainingMaterialValue)||0}</strong><small>훈련 별</small></div><div class="mini-stats"><div class="mini-stat">선수 정보<b>없음</b></div><div class="mini-stat">동일 선수 보너스<b>없음</b></div></div><div class="collection-foot"><span class="active-label" style="color:#8797a4">훈련 재료</span></div></article>`;
+      grid.innerHTML = visibleCards.length ? visibleCards.map(entry=>{
+        if(entry.stackCards) {
+          const card=entry.card,quantity=entry.stackCards.length;
+          return `<article class="collection-card card-training"><div class="collection-card-head"><div><div class="collection-name">훈련 카드</div><div class="collection-position">공용 훈련 재료</div></div><div class="collection-badges">${rarityBadge(card)}<span class="rarity-badge stack-count">×${quantity}</span></div></div><div class="collection-score"><strong>${Number(card.trainingMaterialValue)||0}</strong><small>훈련 별 / 장</small></div><div class="mini-stats"><div class="mini-stat">보유 수량<b>${quantity}장</b></div><div class="mini-stat">동일 선수 보너스<b>없음</b></div></div><div class="collection-foot"><span class="active-label" style="color:#8797a4">훈련 재료 스택</span></div></article>`;
+        }
+        const card=entry.card;
         const stats = getStats(card);
         const labels = statLabels(card);
         const activeCard = active.has(card.id);
