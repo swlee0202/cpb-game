@@ -345,6 +345,9 @@
     .toast { position: fixed; z-index: 20; left: 50%; bottom: 23px; transform: translate(-50%, 18px); opacity: 0; pointer-events: none; transition: .22s ease; padding: 12px 16px; border: 1px solid rgba(193,243,107,.28); background: #1a2632; color: var(--text); border-radius: 10px; box-shadow: var(--shadow); font-size: 11px; }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .mobile-nav { display: none; }
+    .backup-code { width: 100%; min-height: 230px; resize: vertical; color: #dbe4e9; background: #0e151e; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font: 11px/1.55 Consolas, "Courier New", monospace; }
+    .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .backup-help { color: var(--muted); font-size: 10px; line-height: 1.65; margin: 10px 0 0; }
     @media (max-width: 1120px) {
       .app-shell { grid-template-columns: 205px minmax(0,1fr); }
       main { padding-left: 24px; padding-right: 24px; }
@@ -356,7 +359,7 @@
       .sidebar { display: none; }
       .topbar { min-height: 58px; padding: 0 18px; }
       main { padding: 25px 18px 45px; }
-      .mobile-nav { display: grid; grid-template-columns: repeat(6, 1fr); position: fixed; z-index: 10; bottom: 0; left: 0; right: 0; padding: 7px 7px calc(7px + env(safe-area-inset-bottom)); background: rgba(11,16,24,.95); border-top: 1px solid var(--line); backdrop-filter: blur(14px); }
+      .mobile-nav { display: grid; grid-template-columns: repeat(7, 1fr); position: fixed; z-index: 10; bottom: 0; left: 0; right: 0; padding: 7px 7px calc(7px + env(safe-area-inset-bottom)); background: rgba(11,16,24,.95); border-top: 1px solid var(--line); backdrop-filter: blur(14px); }
       .mobile-nav .nav-link { padding: 7px 3px; justify-content: center; flex-direction: column; gap: 4px; font-size: 8px; }
       .mobile-nav .nav-icon { width: 17px; height: 17px; }
       .dashboard-columns { grid-template-columns: 1fr; }
@@ -403,6 +406,7 @@
         <button class="nav-link" data-view="draw"><span class="nav-icon">G</span>선수 뽑기</button>
         <button class="nav-link" data-view="growth"><span class="nav-icon">UP</span>강화와 훈련</button>
         <button class="nav-link" data-view="collection"><span class="nav-icon">C</span>보유 카드</button>
+        <button class="nav-link" data-view="settings"><span class="nav-icon">⚙</span>설정</button>
       </nav>
       <div class="side-bottom"><small>현재 시즌</small><div class="season">2026 CLUB SEASON</div><div class="save-state"><span class="save-dot"></span>브라우저에 자동 저장</div></div>
     </aside>
@@ -473,6 +477,19 @@
           <div class="position-filters" id="collection-position-filters"></div>
           <div class="card-grid" id="collection-grid"></div>
         </section>
+
+        <section class="page" id="page-settings">
+          <div class="page-heading"><div><div class="eyebrow">Settings / Progress backup</div><h1>설정</h1><p>진행 상황을 텍스트 파일로 저장하고 다른 기기에서 이어서 플레이하세요.</p></div><span class="pill">기기 간 진행 상황 이동</span></div>
+          <div class="panel">
+            <div class="panel-head"><div><h2 class="panel-title">진행 상황 백업</h2><p class="panel-subtitle">보유 카드와 카드별 강화·훈련·스킬, 라인업, 티켓, 연습 기록, 리그 진행 상황을 모두 저장합니다.</p></div><span class="rarity-badge rarity-live3">BACKUP</span></div>
+            <div class="notice">게임은 현재 브라우저에 자동 저장됩니다. 다른 기기로 옮기려면 이 기기에서 텍스트 파일을 저장한 뒤, 새 기기에서 파일을 불러와 복원하세요. 백업에는 보유 카드 전체가 포함됩니다.</div>
+            <div class="backup-actions"><button type="button" class="button-primary" id="backup-download">텍스트 파일로 저장</button><button type="button" class="button-secondary" id="backup-copy">백업 내용 복사</button></div>
+            <label class="section-label" for="backup-data">백업 내용</label>
+            <textarea class="backup-code" id="backup-data" spellcheck="false" placeholder="백업 파일을 불러오거나, 복사한 백업 내용을 여기에 붙여넣으세요."></textarea>
+            <div class="backup-actions"><button type="button" class="button-secondary" id="backup-open-file">텍스트 파일 불러오기</button><button type="button" class="button-primary" id="backup-restore">이 백업으로 진행하기</button><input type="file" id="backup-file" accept=".txt,.json,text/plain,application/json" hidden></div>
+            <p class="backup-help">복원하면 이 기기에 저장된 진행 상황이 백업 내용으로 바뀝니다. 다른 기기에서 내보낸 백업 파일을 그대로 선택하거나, 백업 내용을 붙여넣은 뒤 복원하세요.</p>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -483,6 +500,7 @@
     <button class="nav-link" data-view="draw"><span class="nav-icon">G</span>뽑기</button>
     <button class="nav-link" data-view="growth"><span class="nav-icon">UP</span>성장</button>
     <button class="nav-link" data-view="collection"><span class="nav-icon">C</span>카드</button>
+    <button class="nav-link" data-view="settings"><span class="nav-icon">⚙</span>설정</button>
   </nav>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -760,6 +778,66 @@
     function saveState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
       catch (error) { showToast("저장 공간에 접근하지 못했습니다. 브라우저 설정을 확인하세요."); }
+    }
+    function createProgressBackupText() {
+      saveState();
+      return JSON.stringify({format:"diamond-club-progress",version:1,exportedAt:new Date().toISOString(),state},null,2);
+    }
+    function validateProgressBackup(raw) {
+      let backup;
+      try { backup=JSON.parse(raw); }
+      catch (error) { throw new Error("백업 내용을 읽을 수 없습니다. 텍스트 파일의 내용을 확인하세요."); }
+      if(!backup||backup.format!=="diamond-club-progress"||backup.version!==1) throw new Error("Diamond Club 백업 파일이 아니거나 지원하지 않는 형식입니다.");
+      const imported=backup.state;
+      if(!imported||!Array.isArray(imported.cards)||!imported.cards.length||!imported.lineup||!Array.isArray(imported.lineup.batters)) throw new Error("백업에 카드 또는 라인업 정보가 없습니다.");
+      const ids=new Set();
+      for(const card of imported.cards) {
+        if(!card||card.id===undefined||card.id===null||!Array.isArray(card.stats)||card.stats.length!==6) throw new Error("카드 정보가 올바르지 않아 복원할 수 없습니다.");
+        if(ids.has(card.id)) throw new Error("중복된 카드 ID가 있어 복원할 수 없습니다.");
+        ids.add(card.id);
+      }
+      if(imported.activeLeague&&!Array.isArray(imported.activeLeague.teams)) throw new Error("진행 중인 리그 정보가 올바르지 않습니다.");
+      return imported;
+    }
+    function downloadProgressBackup() {
+      const backupText=createProgressBackupText();
+      document.getElementById("backup-data").value=backupText;
+      const blob=new Blob([backupText],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),link=document.createElement("a");
+      link.href=url; link.download=`diamond-club-backup-${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+      showToast("전체 진행 상황을 텍스트 파일로 저장했습니다.");
+    }
+    async function copyProgressBackup() {
+      const field=document.getElementById("backup-data");
+      field.value=createProgressBackupText();
+      try {
+        if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(field.value);
+        else throw new Error("clipboard unavailable");
+        showToast("백업 내용을 복사했습니다.");
+      } catch (error) {
+        field.focus(); field.select();
+        let copied=false;
+        try { copied=document.execCommand("copy"); } catch (copyError) {}
+        if(copied) showToast("백업 내용을 복사했습니다.");
+        else showToast("백업 내용이 아래에 표시되었습니다. 직접 복사하세요.");
+      }
+    }
+    async function readProgressBackupFile(file) {
+      if(!file) return;
+      try {
+        document.getElementById("backup-data").value=await file.text();
+        showToast("백업 파일을 읽었습니다. 내용을 확인한 뒤 복원하세요.");
+      } catch (error) { showToast("백업 파일을 읽지 못했습니다."); }
+    }
+    function restoreProgressBackup() {
+      let imported;
+      try { imported=validateProgressBackup(document.getElementById("backup-data").value); }
+      catch (error) { showToast(error.message||"백업을 확인할 수 없습니다."); return; }
+      if(!window.confirm("이 기기의 현재 진행 상황을 백업 내용으로 바꾸고 새로고침할까요?")) return;
+      try {
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(imported));
+        window.location.reload();
+      } catch (error) { showToast("복원하지 못했습니다. 브라우저 저장 공간을 확인하세요."); }
     }
     function cardById(id) { return state.cards.find(card => card.id === id) || null; }
     function lineupStarterIds() { return Array.isArray(state.lineup.starters)?state.lineup.starters:[state.lineup.sp].filter(Boolean); }
@@ -1680,6 +1758,11 @@
       document.querySelectorAll("[data-game-tab]").forEach(button=>button.addEventListener("click",()=>{activeGameTab=button.dataset.gameTab;renderGame();}));
       document.getElementById("enhance-button").addEventListener("click",attemptEnhance);
       document.getElementById("train-button").addEventListener("click",applyTraining);
+      document.getElementById("backup-download").addEventListener("click",downloadProgressBackup);
+      document.getElementById("backup-copy").addEventListener("click",copyProgressBackup);
+      document.getElementById("backup-open-file").addEventListener("click",()=>document.getElementById("backup-file").click());
+      document.getElementById("backup-file").addEventListener("change",event=>{const file=event.target.files?.[0]; event.target.value=""; readProgressBackupFile(file);});
+      document.getElementById("backup-restore").addEventListener("click",restoreProgressBackup);
       document.getElementById("reset-game").addEventListener("click",()=>{
         if(state.activeMatch) { showToast("경기가 끝난 뒤 새 게임을 시작할 수 있습니다."); return; }
         if (!window.confirm("저장된 라인업과 보유 카드를 초기화하고 새 게임을 시작할까요?")) return;
