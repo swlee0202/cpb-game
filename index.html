@@ -593,6 +593,16 @@
       {name:"황현우",year:25,grade:"Sig",position:"LF",overall:71,stats:[75,74,71,64,67,73]},
       {name:"배상운",year:26,grade:"Sig",position:"CF",overall:71,stats:[79,70,72,67,74,65]},
       {name:"유선재",year:26,grade:"Sig",position:"CP",overall:71,stats:[70,67,75,72,67,72]},
+      {name:"손윤호",year:26,grade:"IMP",position:"SP",overall:73,stats:[70,74,78,74,68,74],skill:"에어라인"},
+      {name:"남연우",year:26,grade:"IMP",position:"3B",overall:72,stats:[80,74,66,72,66,76],skill:"에어라인"},
+      {name:"박시준",year:26,grade:"IMP",position:"RF",overall:73,stats:[69,79,76,72,70,71],skill:"에어라인"},
+      {name:"안소울",year:26,grade:"IMP",position:"RP",overall:72,stats:[66,72,74,70,73,75],skill:"에어라인"},
+      {name:"양은규",year:26,grade:"IMP",position:"SS",overall:73,stats:[74,76,67,73,70,76],skill:"에어라인"},
+      {name:"염상윤",year:26,grade:"IMP",position:"C",overall:73,stats:[75,77,73,70,68,76],skill:"에어라인"},
+      {name:"유선재",year:26,grade:"IMP",position:"CP",overall:73,stats:[68,70,79,70,71,77],skill:"에어라인"},
+      {name:"이수종",year:26,grade:"IMP",position:"DH",overall:64,stats:[82,68,77,70,58,30],skill:"에어라인"},
+      {name:"손윤호",year:26,grade:"IMP",position:"SP",overall:72,stats:[71,69,70,71,74,74],skill:"분위기 메이커"},
+      {name:"임윤서",year:26,grade:"IMP",position:"LF",overall:72,stats:[73,77,64,76,68,72],skill:"에어라인"},
       {name:"이준우",year:25,grade:"LIVE 5",position:"2B",overall:71,stats:[72,70,68,71,70,76]},
       {name:"이승원",year:26,grade:"LIVE 5",position:"SP",overall:73,stats:[69,72,74,73,69,78]},
       {name:"남연우",year:25,grade:"LIVE 5",position:"3B",overall:70,stats:[75,70,66,68,67,72]},
@@ -658,7 +668,11 @@
       "키스톤": {1:[1,2,3,4,6,8],5:[1,2,3,4,6,8]},
       "분위기 메이커": {2:[1,2,3,4,5,6],3:[1,2,3,4,5,6]},
       "나는코더다": {1:[2,3,4,6,8,10]},
-      "4.3": {2:[3,4,5,6,8,10]}
+      "4.3": {2:[3,4,5,6,8,10]},
+      "에어라인": {
+        batter:{0:[1,1,2,2,3,3],1:[2,3,4,5,6,7]},
+        pitcher:{1:[2,3,4,5,6,7],2:[1,1,2,2,3,3]}
+      }
     };
     const STAT_NAMES = {
       pitcher:["구속","변화","구위","제구","지구력","수비"],
@@ -954,15 +968,20 @@
     function skillBonus(card,index) {
       const skillLevel = skillLevelFor(card);
       if (card.rarity !== "IMPACT" || !card.skill || !skillLevel) return 0;
-      const levels = SKILL_EFFECTS[card.skill]?.[index];
+      const levels = skillEffectsFor(card)[index];
       if (!levels) return 0;
       return levels[Math.min(Math.max(skillLevel,1),levels.length)-1] || 0;
+    }
+    function skillEffectsFor(card) {
+      const effects=SKILL_EFFECTS[card.skill]||{};
+      if(effects.pitcher||effects.batter) return effects[PITCHER_POSITIONS.includes(card.position)?"pitcher":"batter"]||{};
+      return effects;
     }
     function skillTooltip(card) {
       if (card.rarity !== "IMPACT" || !card.skill) return "";
       const currentLevel = skillLevelFor(card);
       const labels = statLabels(card);
-      const effects = SKILL_EFFECTS[card.skill] || {};
+      const effects = skillEffectsFor(card);
       const details = Object.entries(effects).map(([index,levels])=>`${labels[Number(index)]} +${levels[Math.min(currentLevel-1,levels.length-1)]} · 레벨별 ${levels.join(" / ")}`).join("\n");
       return `${card.skill} Lv.${currentLevel}\n${details}`;
     }
