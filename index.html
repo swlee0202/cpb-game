@@ -467,14 +467,14 @@
         </section>
 
         <section class="page" id="page-draw">
-          <div class="page-heading"><div><div class="eyebrow">Player acquisition</div><h1>선수 뽑기</h1><p>한 번에 1명 또는 10명을 영입합니다. 각 카드마다 표시된 비율로 판정하며, LIVE 5성은 나오지 않을 때까지 다시 판정합니다.</p></div><span class="pill">1명 · 10명 뽑기</span></div>
+          <div class="page-heading"><div><div class="eyebrow">Player acquisition</div><h1>선수 뽑기</h1><p>한 번에 1명 또는 10명을 영입합니다. 등급별 획득 비율에 따라 해당 카드 풀에서 무작위로 뽑습니다.</p></div><span class="pill">1명 · 10명 뽑기</span></div>
           <div class="panel"><div class="panel-head"><div><h2 class="panel-title">보유 스카우트 티켓</h2><p class="panel-subtitle">뽑기 1회당 해당 티켓 1장이 필요합니다. 10명 뽑기는 티켓 10장을 사용합니다.</p></div></div><div class="ticket-strip" id="draw-ticket-balances"></div></div>
           <div class="draw-grid" style="margin-top:14px">
-            <article class="draw-card"><div class="draw-label">Standard pack</div><h2>LIVE 뽑기</h2><p>최종 획득 비율입니다. LIVE 5성 기본 판정 2%는 재추첨합니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>86.73%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>13.27%</strong></div><div class="chance-row"><span>LIVE 5성 기본 판정</span><strong>2% 재추첨</strong></div></div><div class="draw-actions"><button class="button-primary" data-pull="LIVE" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="LIVE" data-pull-count="10">10명 뽑기</button></div></article>
-            <article class="draw-card impact"><div class="draw-label">Impact pack</div><h2>IMPACT 뽑기</h2><p>최종 획득 비율입니다. IMPACT는 4성, LIVE 5성은 재추첨합니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>85%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>13%</strong></div><div class="chance-row"><span>IMPACT 4성</span><strong>2%</strong></div><div class="chance-row"><span>LIVE 5성 기본 판정</span><strong>1.96% 재추첨</strong></div></div><div class="draw-actions"><button class="button-secondary" data-pull="IMPACT" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="IMPACT" data-pull-count="10">10명 뽑기</button></div></article>
-            <article class="draw-card signature"><div class="draw-label">Signature pack</div><h2>Signature 뽑기</h2><p>최종 획득 비율입니다. Signature는 1%, LIVE 5성은 재추첨합니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>85.87%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>13.13%</strong></div><div class="chance-row"><span>Signature</span><strong>1%</strong></div><div class="chance-row"><span>LIVE 5성 기본 판정</span><strong>1.98% 재추첨</strong></div></div><div class="draw-actions"><button class="button-secondary" data-pull="SIGNATURE" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="SIGNATURE" data-pull-count="10">10명 뽑기</button></div></article>
+            <article class="draw-card"><div class="draw-label">Standard pack</div><h2>LIVE 뽑기</h2><p>최종 획득 비율입니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>85%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>13%</strong></div><div class="chance-row"><span>LIVE 5성</span><strong>2%</strong></div></div><div class="draw-actions"><button class="button-primary" data-pull="LIVE" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="LIVE" data-pull-count="10">10명 뽑기</button></div></article>
+            <article class="draw-card impact"><div class="draw-label">Impact pack</div><h2>IMPACT 뽑기</h2><p>최종 획득 비율입니다. IMPACT 4성은 2% 확률입니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>83.30%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>12.74%</strong></div><div class="chance-row"><span>LIVE 5성</span><strong>1.96%</strong></div><div class="chance-row"><span>IMPACT 4성</span><strong>2%</strong></div></div><div class="draw-actions"><button class="button-secondary" data-pull="IMPACT" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="IMPACT" data-pull-count="10">10명 뽑기</button></div></article>
+            <article class="draw-card signature"><div class="draw-label">Signature pack</div><h2>Signature 뽑기</h2><p>최종 획득 비율입니다. Signature는 1% 확률입니다.</p><div class="chance-list"><div class="chance-row"><span>LIVE 3성</span><strong>84.15%</strong></div><div class="chance-row"><span>LIVE 4성</span><strong>12.87%</strong></div><div class="chance-row"><span>LIVE 5성</span><strong>1.98%</strong></div><div class="chance-row"><span>Signature</span><strong>1%</strong></div></div><div class="draw-actions"><button class="button-secondary" data-pull="SIGNATURE" data-pull-count="1">1명 뽑기</button><button class="button-secondary" data-pull="SIGNATURE" data-pull-count="10">10명 뽑기</button></div></article>
           </div>
-          <p class="notice">LIVE 5성 결과는 목록에 없는 등급이므로 LIVE 5성이 나오지 않을 때까지 같은 뽑기를 다시 판정합니다. 보유 카드는 데이터 목록의 연도·등급 기록에서만 생성됩니다.</p>
+          <p class="notice">LIVE 5성은 LIVE 뽑기에서 2%, IMPACT 뽑기에서 1.96%, Signature 뽑기에서 1.98% 확률로 획득합니다. 보유 카드는 데이터 목록의 연도·등급 기록에서 생성됩니다.</p>
           <div class="dashboard-columns" style="margin-top:14px;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr)"><div class="panel"><div class="panel-head"><div><h2 class="panel-title">최근 영입</h2><p class="panel-subtitle">가장 최근에 뽑은 선수 카드</p></div><button class="text-link" data-goto="collection">보유 카드</button></div><div id="draw-result" class="draw-result"></div></div><div class="panel"><div class="panel-head"><div><h2 class="panel-title">뽑기 기록</h2><p class="panel-subtitle">최근 결과 8건</p></div><span class="pill" id="pull-count">0회</span></div><div class="history-list" id="draw-history"></div></div></div>
         </section>
 
@@ -592,7 +592,20 @@
       {name:"강동현",year:25,grade:"Sig",position:"2B",overall:71,stats:[68,75,73,63,70,75]},
       {name:"황현우",year:25,grade:"Sig",position:"LF",overall:71,stats:[75,74,71,64,67,73]},
       {name:"배상운",year:26,grade:"Sig",position:"CF",overall:71,stats:[79,70,72,67,74,65]},
-      {name:"유선재",year:26,grade:"Sig",position:"CP",overall:71,stats:[70,67,75,72,67,72]}
+      {name:"유선재",year:26,grade:"Sig",position:"CP",overall:71,stats:[70,67,75,72,67,72]},
+      {name:"이준우",year:25,grade:"LIVE 5",position:"2B",overall:71,stats:[72,70,68,71,70,76]},
+      {name:"이승원",year:26,grade:"LIVE 5",position:"SP",overall:73,stats:[69,72,74,73,69,78]},
+      {name:"남연우",year:25,grade:"LIVE 5",position:"3B",overall:70,stats:[75,70,66,68,67,72]},
+      {name:"박시준",year:25,grade:"LIVE 5",position:"RF",overall:70,stats:[68,74,72,69,65,70]},
+      {name:"양은규",year:26,grade:"LIVE 5",position:"SS",overall:72,stats:[75,71,69,76,70,70]},
+      {name:"강동현",year:25,grade:"LIVE 5",position:"2B",overall:71,stats:[69,72,66,73,73,71]},
+      {name:"박시후",year:25,grade:"LIVE 5",position:"RP",overall:72,stats:[73,70,74,75,67,74]},
+      {name:"김민재",year:25,grade:"LIVE 5",position:"1B",overall:71,stats:[71,73,75,77,66,63]},
+      {name:"박소현",year:25,grade:"LIVE 5",position:"RP",overall:70,stats:[68,71,72,75,70,66]},
+      {name:"김지안",year:25,grade:"LIVE 5",position:"RP",overall:70,stats:[70,74,70,72,67,69]},
+      {name:"김준영",year:25,grade:"LIVE 5",position:"LF",overall:72,stats:[72,75,78,71,68,69]},
+      {name:"박일묵",year:25,grade:"LIVE 5",position:"3B",overall:72,stats:[73,78,70,72,68,69]},
+      {name:"임이안",year:26,grade:"LIVE 5",position:"C",overall:73,stats:[74,75,73,69,76,72]}
     ];
     const RARITY = {
       LIVE3: {label:"LIVE 3성", css:"live3", stars:3, material:1, boost:[1,1]},
@@ -1097,12 +1110,10 @@
       const special = Math.random();
       if (type === "IMPACT" && special < .02) return "IMPACT";
       if (type === "SIGNATURE" && special < .01) return "SIGNATURE";
-      let liveRarity;
-      do { liveRarity = rollLiveRarity(); } while (liveRarity === "LIVE5");
-      return liveRarity;
+      return rollLiveRarity();
     }
     function drawRecordFor(rarityType) {
-      const grade = {LIVE3:"LIVE 3",LIVE4:"LIVE 4",IMPACT:"IMP",SIGNATURE:"Sig"}[rarityType];
+      const grade = {LIVE3:"LIVE 3",LIVE4:"LIVE 4",LIVE5:"LIVE 5",IMPACT:"IMP",SIGNATURE:"Sig"}[rarityType];
       const pool = grade ? CARD_RECORDS.filter(record=>record.grade===grade) : [];
       return pool[Math.floor(Math.random()*pool.length)];
     }
